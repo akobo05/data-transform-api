@@ -10,7 +10,7 @@ export class DirectStrategy implements TransformStrategy {
 
 // 2. Constant: Pone un valor fijo siempre
 export class ConstantStrategy implements TransformStrategy {
-  apply(rule: TransformationRule, record: any): any {
+  apply(rule: TransformationRule, _record: any): any {
     if (rule.value === undefined) throw new Error('Missing value for constant strategy');
     return rule.value;
   }
