@@ -45,6 +45,9 @@ lerna-debug.log*
 # Claude Code
 CLAUDE.md
 
+# Prisma generated clients
+src/generated/
+
 # temp directory
 .temp
 .tmp
