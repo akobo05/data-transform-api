@@ -38,7 +38,7 @@ export class AppService {
         }
       }
 
-      // Estructura de respuesta según el test
+
       const resultObj: any = {
         success: errors.length === 0,
         data: transformedData
