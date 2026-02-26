@@ -7,7 +7,6 @@ export class AppController {
 
   @Post('transform')
   transform(@Body() payload: any) {
-    // Aquí estaba el error: llamaba a getHello() en vez de transformData()
     return this.appService.transformData(payload);
   }
 }
