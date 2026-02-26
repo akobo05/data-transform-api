@@ -65,4 +65,33 @@ export class EtlService {
       throw new Error(`Error loading data into target: ${error.message}`);
     }
   }
+
+  async runFullMigration(strategyName: string = 'normalize'): Promise<{
+    status: string;
+    records_processed: number;
+    timestamp: string;
+  }> {
+    this.logger.log('Starting ETL migration...');
+
+    this.logger.log('Phase 1/3: Extracting data from source...');
+    const rawRecords = await this.extractData();
+    this.logger.log(`Extracted ${rawRecords.length} records.`);
+
+    this.logger.log(`Phase 2/3: Transforming records with strategy "${strategyName}"...`);
+    const processedRecords = this.processRecords(rawRecords, strategyName);
+    this.logger.log(`Transformed ${processedRecords.length} records.`);
+
+    this.logger.log('Phase 3/3: Loading data into target (clearing previous run)...');
+    await this.targetDb.processedData.deleteMany();
+    const { inserted } = await this.loadData(processedRecords);
+    this.logger.log(`Inserted ${inserted} records into target.`);
+
+    this.logger.log('ETL migration completed successfully.');
+
+    return {
+      status: 'success',
+      records_processed: inserted,
+      timestamp: new Date().toISOString(),
+    };
+  }
 }
