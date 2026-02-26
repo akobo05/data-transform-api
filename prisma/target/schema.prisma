@@ -7,3 +7,11 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL_TARGET")
 }
+
+model ProcessedData {
+  id               String   @id @default(uuid())
+  original_text    String
+  transformed_text String
+  strategy_used    String
+  processed_at     DateTime @default(now())
+}
