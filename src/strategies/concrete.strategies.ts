@@ -1,16 +1,17 @@
-import { TransformStrategy, TransformationRule } from './transform.interface';
+import { PrimitiveValue, TransformStrategy, TransformationRule } from './transform.interface';
 
 // 1. Direct: Copia tal cual (ej: name -> full_name)
 export class DirectStrategy implements TransformStrategy {
-  apply(rule: TransformationRule, record: any): any {
+  apply(rule: TransformationRule, record: Record<string, unknown>): PrimitiveValue | undefined {
     if (!rule.source) throw new Error('Missing source field for direct strategy');
-    return record[rule.source];
+    const value = record[rule.source];
+    return value !== undefined && value !== null ? (value as PrimitiveValue) : undefined;
   }
 }
 
 // 2. Constant: Pone un valor fijo siempre
 export class ConstantStrategy implements TransformStrategy {
-  apply(rule: TransformationRule, _record: any): any {
+  apply(rule: TransformationRule, _record: Record<string, unknown>): PrimitiveValue | undefined {
     if (rule.value === undefined) throw new Error('Missing value for constant strategy');
     return rule.value;
   }
@@ -18,29 +19,28 @@ export class ConstantStrategy implements TransformStrategy {
 
 // 3. Conditional: Si pasa X, entonces pon Y
 export class ConditionalStrategy implements TransformStrategy {
-  apply(rule: TransformationRule, record: any): any {
+  apply(rule: TransformationRule, record: Record<string, unknown>): PrimitiveValue | undefined {
     const { condition } = rule;
     if (!condition) throw new Error('Missing condition config');
 
     const recordValue = record[condition.field];
 
-    // Logica simple de comparación (puedes agregar más operadores)
     if (condition.operator === 'eq' && recordValue === condition.value) {
       return condition.then;
     }
-    // Si no se cumple, retornamos null o undefined (el campo no se crea)
     return undefined;
   }
 }
 
 // 4. Computed: Junta varios campos (ej: Nombre + Apellido)
 export class ComputedStrategy implements TransformStrategy {
-  apply(rule: TransformationRule, record: any): any {
+  apply(rule: TransformationRule, record: Record<string, unknown>): PrimitiveValue | undefined {
     if (!rule.params) throw new Error('Missing params for computed strategy');
 
-    // Obtiene los valores de los campos pedidos
-    const values = rule.params.map(field => record[field] || '');
-    // Los une con un espacio (o lo que diga el separador)
-    return values.join(rule.separator || ' ');
+    const values = rule.params.map(field => {
+      const val = record[field];
+      return val !== undefined && val !== null ? String(val) : '';
+    });
+    return values.join(rule.separator ?? ' ');
   }
 }

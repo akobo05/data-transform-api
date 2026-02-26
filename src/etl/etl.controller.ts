@@ -12,9 +12,10 @@ export class EtlController {
   async runMigration(@Body() body: { strategy?: string }) {
     try {
       return await this.etlService.runFullMigration(body?.strategy);
-    } catch (error) {
-      this.logger.error(`Migration failed: ${error.message}`);
-      throw new InternalServerErrorException(`Migration failed: ${error.message}`);
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.error(`Migration failed: ${message}`);
+      throw new InternalServerErrorException(`Migration failed: ${message}`);
     }
   }
 }

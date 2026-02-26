@@ -1,12 +1,17 @@
 import { Injectable } from '@nestjs/common';
+import {
+  TransformError,
+  TransformPayload,
+  TransformRecordResult,
+  PrimitiveValue,
+} from './strategies/transform.interface';
 import { TransformRegistry } from './transform.registry';
 
 @Injectable()
 export class AppService {
   constructor(private readonly registry: TransformRegistry) {}
 
-  transformData(payload: any) {
-    // Verificamos que payload y records existan para evitar errores si envían basura
+  transformData(payload: TransformPayload): { results: TransformRecordResult[] } | { error: string } {
     if (!payload || !payload.records || !payload.rules) {
       return { error: 'Invalid payload structure' };
     }
@@ -14,11 +19,9 @@ export class AppService {
     const { records, rules } = payload;
     const mappings = rules.mappings || [];
 
-    const results = records.map((record: any) => {
-      const transformedData: any = {};
-
-      // SOLUCIÓN: Agregamos ': any[]' para que TypeScript sepa que es una lista
-      const errors: any[] = [];
+    const results = records.map((record) => {
+      const transformedData: Record<string, PrimitiveValue> = {};
+      const errors: TransformError[] = [];
 
       for (const rule of mappings) {
         try {
@@ -30,21 +33,19 @@ export class AppService {
               transformedData[rule.target] = value;
             }
           }
-        } catch (error: any) {
+        } catch (error: unknown) {
           errors.push({
             field: rule.target,
-            message: error.message
+            message: error instanceof Error ? error.message : String(error),
           });
         }
       }
 
-
-      const resultObj: any = {
+      const resultObj: TransformRecordResult = {
         success: errors.length === 0,
-        data: transformedData
+        data: transformedData,
       };
 
-      // Solo agregamos el campo errors si hubo alguno
       if (errors.length > 0) {
         resultObj.errors = errors;
       }

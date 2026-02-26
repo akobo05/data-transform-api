@@ -4,6 +4,7 @@ import {
   ConditionalStrategy,
   ComputedStrategy
 } from './concrete.strategies';
+import { TransformationRule } from './transform.interface';
 
 describe('Strategies', () => {
   let direct: DirectStrategy;
@@ -11,7 +12,6 @@ describe('Strategies', () => {
   let conditional: ConditionalStrategy;
   let computed: ComputedStrategy;
 
-  // Antes de cada test, reiniciamos las estrategias
   beforeEach(() => {
     direct = new DirectStrategy();
     constant = new ConstantStrategy();
@@ -19,56 +19,52 @@ describe('Strategies', () => {
     computed = new ComputedStrategy();
   });
 
-  // 1. Test para Direct Strategy
   describe('DirectStrategy', () => {
     it('debe copiar el valor de un campo', () => {
       const record = { nombre: 'Aaron' };
-      const rule = { type: 'direct', source: 'nombre', target: 'name' } as any;
+      const rule: TransformationRule = { type: 'direct', source: 'nombre', target: 'name' };
       expect(direct.apply(rule, record)).toBe('Aaron');
     });
   });
 
-  // 2. Test para Constant Strategy
   describe('ConstantStrategy', () => {
     it('debe devolver siempre el mismo valor', () => {
-      const rule = { type: 'constant', value: 'v1', target: 'version' } as any;
+      const rule: TransformationRule = { type: 'constant', value: 'v1', target: 'version' };
       expect(constant.apply(rule, {})).toBe('v1');
     });
   });
 
-  // 3. Test para Computed Strategy
   describe('ComputedStrategy', () => {
     it('debe unir campos con un separador', () => {
       const record = { nombre: 'Juan', apellido: 'Perez' };
-      const rule = {
+      const rule: TransformationRule = {
         type: 'computed',
         params: ['nombre', 'apellido'],
         separator: ' ',
-        target: 'full_name'
-      } as any;
+        target: 'full_name',
+      };
       expect(computed.apply(rule, record)).toBe('Juan Perez');
     });
   });
 
-  // 4. Test para Conditional Strategy
   describe('ConditionalStrategy', () => {
     it('debe devolver valor si la condicion se cumple', () => {
       const record = { status: 'active' };
-      const rule = {
+      const rule: TransformationRule = {
         type: 'conditional',
         condition: { field: 'status', operator: 'eq', value: 'active', then: true },
-        target: 'isActive'
-      } as any;
+        target: 'isActive',
+      };
       expect(conditional.apply(rule, record)).toBe(true);
     });
 
     it('debe devolver undefined si la condicion NO se cumple', () => {
       const record = { status: 'inactive' };
-      const rule = {
+      const rule: TransformationRule = {
         type: 'conditional',
         condition: { field: 'status', operator: 'eq', value: 'active', then: true },
-        target: 'isActive'
-      } as any;
+        target: 'isActive',
+      };
       expect(conditional.apply(rule, record)).toBeUndefined();
     });
   });
