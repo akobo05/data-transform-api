@@ -25,8 +25,8 @@ export class EtlService {
   async extractData(): Promise<RawData[]> {
     try {
       return await this.sourceDb.rawData.findMany();
-    } catch (error) {
-      throw new Error(`Error extracting data from source: ${error.message}`);
+    } catch (error: unknown) {
+      throw new Error(`Error extracting data from source: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -47,8 +47,8 @@ export class EtlService {
           transformed_text: strategy.transform(record.text_content),
           strategy_used: strategyName,
         });
-      } catch (error) {
-        this.logger.error(`Error processing record ${record.id}: ${error.message}`);
+      } catch (error: unknown) {
+        this.logger.error(`Error processing record ${record.id}: ${error instanceof Error ? error.message : String(error)}`);
       }
     }
 
@@ -61,8 +61,8 @@ export class EtlService {
         data: processedRecords,
       });
       return { inserted: result.count };
-    } catch (error) {
-      throw new Error(`Error loading data into target: ${error.message}`);
+    } catch (error: unknown) {
+      throw new Error(`Error loading data into target: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 

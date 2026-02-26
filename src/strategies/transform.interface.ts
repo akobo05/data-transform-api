@@ -1,17 +1,38 @@
-// Definimos la estructura que tendrá una "Regla" en el JSON
+export type PrimitiveValue = string | number | boolean | null;
+
 export interface TransformationRule {
   type: 'direct' | 'constant' | 'conditional' | 'computed';
-  target: string;       // El nombre del campo final
-  source?: string;      // Para 'direct': de qué campo sacar el valor
-  value?: any;          // Para 'constant': qué valor fijo poner
-  // Para 'conditional':
-  condition?: { field: string; operator: 'eq' | 'neq'; value: any; then: any };
-  // Para 'computed':
-  params?: string[];    // Qué campos unir
-  separator?: string;   // Con qué unirlos (ej: espacio)
+  target: string;
+  source?: string;
+  value?: PrimitiveValue;
+  condition?: {
+    field: string;
+    operator: 'eq' | 'neq';
+    value: PrimitiveValue;
+    then: PrimitiveValue;
+  };
+  params?: string[];
+  separator?: string;
 }
 
-// El "contrato" (Interface) que todas las estrategias deben seguir
 export interface TransformStrategy {
-  apply(rule: TransformationRule, record: any): any;
+  apply(rule: TransformationRule, record: Record<string, unknown>): PrimitiveValue | undefined;
+}
+
+export interface TransformError {
+  field: string;
+  message: string;
+}
+
+export interface TransformRecordResult {
+  success: boolean;
+  data: Record<string, PrimitiveValue>;
+  errors?: TransformError[];
+}
+
+export interface TransformPayload {
+  records: Record<string, unknown>[];
+  rules: {
+    mappings: TransformationRule[];
+  };
 }
