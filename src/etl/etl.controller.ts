@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, InternalServerErrorException, Logger, Post } from '@nestjs/common';
+import { Controller, HttpCode, InternalServerErrorException, Logger, Post } from '@nestjs/common';
 import { EtlService } from './etl.service';
 
 @Controller('etl')
@@ -9,9 +9,9 @@ export class EtlController {
 
   @Post('run-migration')
   @HttpCode(200)
-  async runMigration(@Body() body: { strategy?: string }) {
+  async runMigration() {
     try {
-      return await this.etlService.runFullMigration(body?.strategy);
+      return await this.etlService.runFullMigration();
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : String(error);
       this.logger.error(`Migration failed: ${message}`);

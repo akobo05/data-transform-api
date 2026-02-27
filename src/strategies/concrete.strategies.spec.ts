@@ -2,7 +2,8 @@ import {
   DirectStrategy,
   ConstantStrategy,
   ConditionalStrategy,
-  ComputedStrategy
+  ComputedStrategy,
+  LookupStrategy
 } from './concrete.strategies';
 import { TransformationRule } from './transform.interface';
 
@@ -11,12 +12,14 @@ describe('Strategies', () => {
   let constant: ConstantStrategy;
   let conditional: ConditionalStrategy;
   let computed: ComputedStrategy;
+  let lookup: LookupStrategy;
 
   beforeEach(() => {
     direct = new DirectStrategy();
     constant = new ConstantStrategy();
     conditional = new ConditionalStrategy();
     computed = new ComputedStrategy();
+    lookup = new LookupStrategy();
   });
 
   describe('DirectStrategy', () => {
@@ -66,6 +69,30 @@ describe('Strategies', () => {
         target: 'isActive',
       };
       expect(conditional.apply(rule, record)).toBeUndefined();
+    });
+  });
+
+  describe('LookupStrategy', () => {
+    it('debe mapear un valor usando el diccionario', () => {
+      const record = { pac_genero: 'M' };
+      const rule: TransformationRule = {
+        type: 'lookup',
+        source: 'pac_genero',
+        target: 'gender',
+        map: { M: 'Male', F: 'Female' },
+      };
+      expect(lookup.apply(rule, record)).toBe('Male');
+    });
+
+    it('debe devolver undefined si el valor no existe en el mapa', () => {
+      const record = { pac_genero: 'X' };
+      const rule: TransformationRule = {
+        type: 'lookup',
+        source: 'pac_genero',
+        target: 'gender',
+        map: { M: 'Male', F: 'Female' },
+      };
+      expect(lookup.apply(rule, record)).toBeUndefined();
     });
   });
 });

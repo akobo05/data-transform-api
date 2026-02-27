@@ -8,8 +8,16 @@ datasource db {
   url      = env("DATABASE_URL_SOURCE")
 }
 
-model RawData {
-  id           String   @id @default(uuid())
-  text_content String
-  created_at   DateTime @default(now())
+model Paciente {
+  id                String @id @default(uuid())
+  pac_cod           String
+  pac_primer_nombre String
+  pac_apellido      String
+  pac_fec_nac       String
+  pac_genero        String
+  pac_dx            String
+  pac_dx_desc       String
+  pac_estado        String
+  pac_edad          Int
+  fec_registro      String
 }
