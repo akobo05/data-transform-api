@@ -1,7 +1,7 @@
 export type PrimitiveValue = string | number | boolean | null;
 
 export interface TransformationRule {
-  type: 'direct' | 'constant' | 'conditional' | 'computed';
+  type: 'direct' | 'constant' | 'conditional' | 'computed' | 'lookup';
   target: string;
   source?: string;
   value?: PrimitiveValue;
@@ -13,6 +13,7 @@ export interface TransformationRule {
   };
   params?: string[];
   separator?: string;
+  map?: Record<string, PrimitiveValue>;
 }
 
 export interface TransformStrategy {

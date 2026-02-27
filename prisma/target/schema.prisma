@@ -8,10 +8,16 @@ datasource db {
   url      = env("DATABASE_URL_TARGET")
 }
 
-model ProcessedData {
-  id               String   @id @default(uuid())
-  original_text    String
-  transformed_text String
-  strategy_used    String
-  processed_at     DateTime @default(now())
+model ClinicalRecord {
+  id                    String   @id @default(uuid())
+  person_source_value   String
+  given_name            String
+  family_name           String
+  birth_date            String
+  gender                String
+  condition_code        String
+  condition_description String
+  visit_status          String
+  age_at_visit          Int
+  migrated_at           DateTime @default(now())
 }

@@ -4,7 +4,8 @@ import {
   DirectStrategy,
   ConstantStrategy,
   ConditionalStrategy,
-  ComputedStrategy
+  ComputedStrategy,
+  LookupStrategy
 } from './strategies/concrete.strategies';
 
 @Injectable() // Esto permite que NestJS lo use en otros lados
@@ -17,6 +18,7 @@ export class TransformRegistry {
     this.strategies.set('constant', new ConstantStrategy());
     this.strategies.set('conditional', new ConditionalStrategy());
     this.strategies.set('computed', new ComputedStrategy());
+    this.strategies.set('lookup', new LookupStrategy());
   }
 
   getStrategy(type: string): TransformStrategy {

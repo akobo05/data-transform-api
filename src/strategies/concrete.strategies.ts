@@ -44,3 +44,15 @@ export class ComputedStrategy implements TransformStrategy {
     return values.join(rule.separator ?? ' ');
   }
 }
+
+// 5. Lookup: Mapea un valor a otro usando un diccionario (ej: M -> Male, ACTIVO -> active)
+export class LookupStrategy implements TransformStrategy {
+  apply(rule: TransformationRule, record: Record<string, unknown>): PrimitiveValue | undefined {
+    if (!rule.source) throw new Error('Missing source field for lookup strategy');
+    if (!rule.map) throw new Error('Missing map for lookup strategy');
+    const raw = record[rule.source];
+    if (raw === undefined || raw === null) return undefined;
+    const key = String(raw);
+    return key in rule.map ? rule.map[key] : undefined;
+  }
+}
